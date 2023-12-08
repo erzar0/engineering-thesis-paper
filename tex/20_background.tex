@@ -1,0 +1,59 @@
+\section{Methodology}
+\subsection{Used Technologies}
+
+All code developed during the project was written in the \texttt{python3} programming language, and the Google Colab runtime environment was utilized, as it provides resources that allows rapid testing of DNN (Deep Neural Network) implementations. 
+Google Colab also enabled easy sharing of interactive notebooks with the thesis supervisor.
+
+The primary technologies and libraries used in the project include:
+\begin{itemize}
+    \item \texttt{python3} programming language
+    \item \texttt{pytorch} - Chosen as the deep learning framework due to the author's familiarity with it and its widespread adoption among researchers (over 60\% of new paper implementations use \texttt{pytorch} \cite{papersWithCodeTrends}).
+    \item \texttt{hdbscan} - Implementation of the HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) algorithm for data clusterization.
+    \item \texttt{umap-learn} - Implementation of the UMAP (Uniform Manifold Approximation and Projection) algorithm for dimensionality reduction.
+    \item \texttt{som-learn} - Implementation of a SOM (Self Organizing Map) algorithm for data clusterization.
+    \item \texttt{scikit-learn}, \texttt{scipy}, \texttt{matplotlib}, \texttt{pandas}, \texttt{numpy} - Common tools used for data analysis in the \texttt{python} ecosystem.
+\end{itemize}
+
+\subsection{Key algorithms}
+\subsubsection{DNN selection}
+
+The initial choice for classifying XRF spectra involved utilizing a neural network from the ResNet family, specifically ResNet50. The selection of ResNet50 was arbitrary but justified by its reputation as a robust CNN architecture. Notably, ResNet architecture won the ImageNet Large Scale Visual Recognition Challenge in 2015 \cite{ImageNet2015}.
+
+ResNet architecture is characterized by its ability to support very deep networks. This is attributed to the presence of residual connections, which allow each block of network for the learning of residual mappings $g(x) = f(x) - x$ rather than the usual mapping $f(x)$ \cite{d2lResnet}. 
+
+If the desired mapping is identity mapping $f(x) = x$, then block must only learn mapping $g(x) = 0$, which is easy to learn. 
+As a result it is hard to degrade performance of this architecture with increasing depth, as it can always learn $g(x) = 0$ - see \prettyref{fig:residual-block}.
+
+\begin{figure}[h] 
+  \centering     
+  \includesvg[width=0.8\textwidth]{img/residual-block.svg} 
+  \caption{``In a regular block (left), the portion within the dotted-line box must directly learn the mapping $f(x)$. 
+  In a residual block (right), the portion within the dotted-line box needs to learn the residual mapping $g(x) = f(x) - x$ \cite{d2lResnet}''}
+  \label{fig:residual-block}
+\end{figure}
+
+However, the original architecture of ResNet incorporates a \emph{Global Average Pooling} operation just before the final fully connected layer. 
+This operation calculates the average value over the spatial dimensions of a single feature map. 
+In the case of adapting ResNet50 to work with 1D spectra, the input \texttt{torch.Tensor} for global average pooling has a shape of (batch\_size, channels, features) and the output of shape (batch\_size, channels, 1). 
+It means that due to averaging over feature dimension the spatial information is lost!
+
+This resulted in the network not performing as expected, especially since peak positions in XRF spectra are crucial to identify elements. 
+Furthermore, replacing global average pooling with a flattening operation was not feasible, as it would lead to \\ $\text{{channels}} \times \text{{features}} \times \text{{fully\_connected\_size}}$ total connections with the fully connected layer. 
+For example, with an input vector of shape $(\text{{batch\_size}}, 2048, 128)$ (which was observed during development), this would result in approximately $5 \times 10^{8}$ total connections!
+
+To address this problem, several possibilities were considered:
+\begin{itemize}
+    \item Modifying the architecture of ResNet to further reduce dimensionality using convolution and pooling operations.
+    \item Reducing size of fully connected layer.
+    \item Opting for a completely different architecture.
+\end{itemize}
+
+While the choice of model was not crucial for this work, and size of the ResNet fully connected layer could have been easily changed, the decision was made to adopt a more modern approach (for fun and because author forget that he can modify ResNet). 
+As a result, the author chose to use the Vision Transformer (ViT).
+
+\subsubsection{ViT}
+
+
+
+
+
