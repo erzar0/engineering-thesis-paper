@@ -39,7 +39,7 @@ It means that due to averaging over feature dimension the spatial information is
 
 This resulted in the network not performing as expected, especially since peak positions in XRF spectra are crucial to identify elements. 
 Furthermore, replacing global average pooling with a flattening operation was not feasible, as it would lead to \\ $\text{{channels}} \times \text{{features}} \times \text{{fully\_connected\_size}}$ total connections with the fully connected layer. 
-For example, with an input vector of shape $(\text{{batch\_size}}, 2048, 128)$ (which was observed during development), this would result in approximately $5 \times 10^{8}$ total connections!
+For example, with an input vector of shape $(\text{{batch\_size}}, 2048, 128)$ (which was observed during development), this would result in approximately $5 \times 10^{8}$ trainable parameters, while default implementation of ResNet50 have only $\sim2.6 \times 10^7$ as a whole!
 
 To address this problem, several possibilities were considered:
 \begin{itemize}
@@ -48,11 +48,35 @@ To address this problem, several possibilities were considered:
     \item Opting for a completely different architecture.
 \end{itemize}
 
-While the choice of model was not crucial for this work, and size of the ResNet fully connected layer could have been easily changed, the decision was made to adopt a more modern approach (for fun and because author forget that he can modify ResNet). 
+While the choice of model was not crucial for this work, and size of the ResNet fully connected layer could have been easily changed, the decision was made to adopt a more modern approach (for fun and because author forget about second option). 
 As a result, the author chose to use the Vision Transformer (ViT).
 
 \subsubsection{ViT}
+To understand ViT one ought to first understand how transformers work in general.
+Transformer architecture was originally meant to be replacement for RNNs (Recurrent Neural Networks) \cite{Vaswani2017}.
+Although transformers need more training data (due to small inductive bias\footnote{e.g. ``In computer vision related tasks, the great success of convolutional neural networks (CNN) is often attributed to its inductive biases, such as locality and translation equivariance. \cite{Mormille2023}''. 
+In contrast, transformers exhibit less inductive biases, enabling them explore a broader hypothesis space. 
+Consequently, they may converge to local optima and generalize poorly on unseen data, when trained on insufficient data.}) 
+than recurrent networks to achieve similar results, they have significant advantage in terms of parallelization.
 
+Unlike classic RNNs, which require the use of the previously calculated hidden state at time step $t-1$ to compute the hidden state at time step $t$, making them non-parallelizable, transformers are highly parallelized, thanks to Multi-Head Attention.
+% \sum_{i=1}^{m}\alpha(q, k_i)v_i
+
+Multi-Head Attention works based on \emph{attention mechanism}, which is somehow similar to database query \cite{d2lAttentionMechanism}.
+To explain that let's define a key-value database consisting of $(\mathbf{k}, \textbf{v})$ $m$-dimensional vector pairs that can be queried with $\mathbf{q}$ $m$-dimensional vector query: \[ D\overset{\text{def}}{=}\{(\mathbf{k_i}, \mathbf{v_i}) \mid i = 1, 2, \ldots, n\}\]
+Then attention over $D$ can be denoted as:
+\[ A(\mathbf{q}, D) = \sum_{i=1}^{n}\alpha(\mathbf{q}, \mathbf{k_i})\mathbf{v_i} \]
+Where $\alpha(\mathbf{q}, \mathbf{k_i}) \in \mathbb{R}$ are attention weights.
+
+If exactly one of the weights $\alpha(\mathbf{q},\mathbf{k_i}) = 1$, while all others are $0$, then attention works exactly like normal database query returning value of $\mathbf{v_i}$ if there exists $\mathbf{k_i}$ that matches $\mathbf{q}$.
+
+If there are multiple non-zero weights then some linear combination of vectors is retrieved. 
+For deep learning applications in most cases we would like to have $\sum_i\alpha(\mathbf{q}, \mathbf{k_i}) = 1$ and $\alpha(\mathbf{q}, \mathbf{k_i}) > 0$. To guarantee this behaviour, the Softmax function can be applied:
+
+\[ \alpha(\mathbf{q}, \mathbf{k_i}) = \frac{\text{exp}(\mathbf{q}, \mathbf{k_i})}{\sum_j \text{exp}(\mathbf{q}, \mathbf{k_j})} \]
+
+The last thing to be defined in this model is how the attention weights are calculated.
+In this case there won't be exact matches between $\mathbf{q}$ and $\mathbf{k}$, so $\alpha(\mathbf{q}, \mathbf{k_i}$ fined as must be de
 
 
 
