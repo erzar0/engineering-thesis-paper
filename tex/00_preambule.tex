@@ -12,13 +12,32 @@
 \usepackage{minted}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage{csquotes}
 \usepackage{microtype}
 \usepackage{prettyref}
 \usepackage{overpic}
 \usepackage{svg}
+\usepackage{listings}
+
+\newcommand\norm[1]{\Vert#1\Vert}
+
+\definecolor{mintedbackground}{rgb}{0.95,0.95,0.95}
+
+\newmintedfile[pythoncode]{python}{
+bgcolor=mintedbackground,
+fontfamily=tt,
+linenos=true,
+numberblanklines=true,
+breaklines=true,
+breakanywhere=true,
+fontsize=\footnotesize,
+frame=leftline,
+tabsize=4,
+}
 
 \newrefformat{fig}{Figure~[\ref{#1}]}
+\newrefformat{lst}{Listing~\ref{#1}}
 \usepackage{subcaption}
 
 \geometry{hmargin={2.5cm, 2cm}, height=10.0in}
@@ -32,9 +51,3 @@
 \pretocmd{\section}{\cleardoublepage}{}{}
 
 \input{tex/01_title_page}
-
-\setminted[c]{frame=lines,
-    framesep=2mm,
-    baselinestretch=1.2,
-    fontsize=\footnotesize,
-    linenos}
