@@ -111,6 +111,51 @@ Where $head_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V) \in \mathbb{R}^{p_v}$  
 To better manage computational cost, the input sizes for each head are parameterized in following manner: $p_k = p_v = p_o / h$, where $h$ is number of heads and $p_o$ is size of output of last fully connected layer. Thanks to that, computational cost don't increase with higher number of heads.
 
 \subsubsection{ViT Architecture}
+Multi-Head Attention is the most important concept used in transformer architecture, it is no different when it comes to Vision Transformer \cite{vitPaper}.
+DNN architecture used to classify XRF spectra is slightly modified version of ViT, which was adapted to work with 1D input.
+
+Most parts of the architecture remain unchanged.
+Transformer encoder (\prettyref{lst:transformer_encoder}) is implemented in exactly the same as in original paper - \prettyref{fig:transformer-encoder}.
+In contrast to the original transformer encoder architecture \cite{Vaswani2017}, layer normalization in ViT is applied before all MHA and MLP (Multi Layer Perceptron) in order to enhance training effectiveness.
+Moreover, the commonly used non-linear activation function ReLU (Rectified Linear Unit) was replaced with its smoother counterpart, GELU (Gaussian-Error Linear Unit).
+
+\begin{figure}[H] 
+  \centering     
+  \includegraphics[width=0.2\textwidth]{img/transformer-encoder.png} 
+  \caption{Transformer Encoder architecture. Source: \cite{vitPaper}}
+  \label{fig:transformer-encoder}
+\end{figure}
+
+\newenvironment{longlistingA}{\captionsetup{type=listing, width=0.8\textwidth}}{}
+\begin{longlistingA}
+    \pythoncode{listings/transformer_encoder.py}
+    \caption{Implementation of Transformer Encoder block. The implementation details were based on \cite{d2lViT}}
+    \label{lst:transformer_encoder}
+\end{longlistingA}
+
+Several modifications were introduced in the remaining part of the original implementation - \prettyref{fig:original-vit-architecture}.
+Notably, the \texttt{[class]} token was removed.
+\texttt{[class]} token was an idea introduced in model BERT (Bidirectional Encoder Representations from Transformers) \cite{bertOriginal} and it was used as an input to classifying MLP.
+However, due to small embedding and input size it was possible to remove it and replace with fully connected layer.
+Additionally, the authors discovered that the \texttt{[class]} token was not inherently superior to other methods; they required just a distinct learning rate \cite{vitPaper}.
+\begin{figure}[H] 
+  \centering     
+  \includegraphics[width=0.8\textwidth]{img/original_vit.png} 
+  \caption{Original ViT architecture. Source: \cite{vitPaper}}
+  \label{fig:original-vit-architecture}
+\end{figure}
+
+\begin{figure}[H] 
+  \centering     
+  \includegraphics[width=0.8\textwidth]{img/vit_changed.png} 
+  \caption{Modified ViT architecture.}
+  \label{fig:modified-vit-architecture}
+\end{figure}
+
+
+
+
+
 
 \subsubsection{Self-Organizing Map}
 Being able to classify elements in the spectrum is only part of the success. Data gathered using FF-XRF has a mean of around 20,000 photon counts per one spatial coordinate – that is a high count. However, when distributed over $\sim$4000 possible energy levels, it provides a rather noisy spectrum, which may not yield correct classification.
@@ -147,7 +192,18 @@ The function $\theta(u, v, s)$ represents the neighborhood function, where the B
 An example of a neighborhood function could be a Gaussian kernel. 
 The function $\alpha(s)$ represents the learning rate schedule, which reduces the learning rate as the number of iterations increases.
 
-\begin{figure}[h] 
+Although algorithm is fairly simple, the most popular python packages don't have its implementation, and the most popular implementation - package \texttt{minisom} had too large RAM memory requirements, which sometimes lead to crashing Colab environment with 50GB of memory.
+Because of that its basic implementation was written using python and \texttt{numpy} package - \prettyref{lst:som}. 
+
+\newenvironment{longlistingB}{\captionsetup{type=listing, width=0.8\textwidth}}{}
+
+\begin{longlistingB}
+    \pythoncode{listings/som.py}
+    \caption{Simple Self-Organizing Map implementation}
+    \label{lst:som}
+\end{longlistingB}
+
+\begin{figure}[H] 
     \centering     
     \begin{overpic}[width=0.8\linewidth]{img/som.png}
         \put(56,39){\textcolor{black}{\fontsize{20}{16}\selectfont $\mathbf{d}$}}
@@ -156,37 +212,25 @@ The function $\alpha(s)$ represents the learning rate schedule, which reduces th
     \label{fig:som}
 \end{figure}
 
-Although algorithm is fairly simple, the most popular python packages don't have its implementation, and the most popular implementation - package \texttt{minisom} had too large RAM memory requirements, which sometimes lead to crashing Colab environment with 50GB of memory.
-Because of that its basic implementation was written using python and \texttt{numpy} package - \prettyref{lst:som}. 
-
-\newenvironment{longlisting}{\captionsetup{type=listing}}{}
-
-\begin{longlisting}
-    \pythoncode{listings/som.py}
-    \caption{Simple Self-Organizing Map implementation}
-    \label{lst:som}
-\end{longlisting}
-
 \subsubsection{UMAP and HDBSCAN Clustering Pipeline}
 Unfortunately, clustering the data with SOM showed some weird artifacts in all analyzed samples.
 It was the reason to find alternative clusterization method to ensure that the artifacts were not caused by the algorithm.
-After some research it was found that UMAP (Uniform Manifold Approximation and Projection) $\rightarrow$ HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) pipeline should also work with high dimensional data. 
+After some research it was found that UMAP (Uniform Manifold Approximation and Projection) $\rightarrow$ HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) pipeline should also work with large datasets of high dimensional data. 
 
-According to the documentation: ``Since UMAP does not necessarily produce clean spherical clusters something like K-Means is a poor choice. I would recommend HDBSCAN or similar. 
+According to the UMAP documentation: ``Since UMAP does not necessarily produce clean spherical clusters something like K-Means is a poor choice. I would recommend HDBSCAN or similar. 
 The catch here is that UMAP, with its uniform density assumption, does not preserve density well. 
 What UMAP will do, however, is contract connected components of the manifold together. 
 Providing you have enough data for UMAP to distinguish that information then you can get useful clustering results out since algorithms like HDBSCAN will easily pick out the components after applying UMAP.
 UMAP does offer significant improvements over algorithms like t-SNE for clustering. 
 First, by preserving more global structure and creating meaningful separation between connected components of the manifold on which the data lies, UMAP offers more meaningful clusters. \cite{umapFaq}''
 
-Even though UMAP looses in performance terms to PCA (Principal Component Analysis) - \prettyref{fig:umap_performance}, it may provide more useful dimensional embeddings, as PCA is simple linear transformation, wheres UMAP is non-linear algorithm. 
-\begin{figure}[h] 
+Although UMAP looses in performance terms to PCA (Principal Component Analysis) originally used in \cite{Lach2022} - \prettyref{fig:umap_performance}, it may provide more useful dimensional embeddings, as PCA is simple linear transformation, wheres UMAP is non-linear algorithm. 
+\begin{figure}[H] 
   \centering     
   \includegraphics[width=0.8\textwidth]{img/performance_umap.png} 
   \caption{UMAP is characterized by good performance. Source: \cite{umapPerformance}}
   \label{fig:umap_performance}
 \end{figure}
 
-In the next step output of UMAP may be passed to HDBSCAN, which is evolution of DBSCAN algorithm.
-The main difference between HDBSCAN and DBSCAN is that density in DBSCAN is determined as one of parameters so it works poorly when clusters have different densities. 
-On the other hand 
+In the next step output of UMAP may be passed to HDBSCAN, which is a followup to DBSCAN algorithm.
+The key difference between HDBSCAN and DBSCAN is that HDBSCAN can determine clusters with different densities.
