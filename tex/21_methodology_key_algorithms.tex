@@ -32,13 +32,13 @@ To address this problem, several possibilities were considered:
     \item Opting for a completely different architecture.
 \end{enumerate}
 
-While the choice of model was not crucial for this work, and size of the ResNet fully connected layer could have been easily changed, the decision was to change used architecture completely (for fun and because author forget about second option). 
+While the choice of model was not crucial for this work, and size of the ResNet fully connected layer could have been easily changed, the decision was made to change used architecture completely (for fun and because author forget about the second option). 
 As a result, the author chose to use the Vision Transformer (ViT).
 
 \subsubsection{Multi-Head Attention}
 To understand ViT one ought to first understand how transformers work in general.
 Transformer architecture was originally meant to be replacement for RNNs (Recurrent Neural Networks) \cite{Vaswani2017}.
-Although transformers need more training data (due to small inductive bias\footnote{e.g. ``In computer vision related tasks, the great success of convolutional neural networks (CNN) is often attributed to its inductive biases, such as locality and translation equivariance. \cite{Mormille2023}''. 
+Although transformers needs more training data (due to small inductive bias\footnote{e.g. ``In computer vision related tasks, the great success of convolutional neural networks (CNN) is often attributed to its inductive biases, such as locality and translation equivariance. \cite{Mormille2023}''. 
 In contrast, transformers exhibit less inductive biases, enabling them to explore a broader hypothesis space. 
 Consequently, they may converge to local optima and generalize poorly on unseen data, when trained on insufficient data.}) 
 than recurrent networks to achieve similar results, they have significant advantage in terms of parallelization.
@@ -58,14 +58,14 @@ For deep learning applications the following properties are desirable: $\sum_i \
 \[ \alpha(\mathbf{q}, \mathbf{k_i}) = \text{Softmax}(\text{a}(\mathbf{q}, \mathbf{k_i})) = \frac{\text{exp}(\text{a}(\mathbf{q}, \mathbf{k_i}))}{\sum_j \text{exp}(\text{a}(\mathbf{q}, \mathbf{k_j}))} \]
 
 The last thing to be defined is the attention scoring function $\text{a}(\mathbf{q}, \mathbf{k_i})$.
-It is highly unlikely for any exact match to exist between $\mathbf{q}$ and $\mathbf{k_i}$, so $\text{a}(\mathbf{q}, \mathbf{k_i})$ must be defined as some similarity function between vectors in feature space.
+It is highly unlikely to find any exact match between $\mathbf{q}$ and $\mathbf{k_i}$, so $\text{a}(\mathbf{q}, \mathbf{k_i})$ must be defined as some similarity function between vectors in feature space.
 
 Let's take a look at Gaussian similarity kernel, which is non-linear function of euclidean distance:
 \[\text{K}(\mathbf{x}, \mathbf{x'}) = \text{exp}(-\frac{\norm{\mathbf{x} - \mathbf{x'}}}{2\sigma})\]
 It has nice property of being bound between zero and one, unlike euclidean distance which could be anything and lead to numerical instabilities.
 However, it has disadvantage of being computationally costly.
 
-Now skip the exponentiation, substitute $\mathbf{q}$ and $\mathbf{k_i}$, and expand it:
+Now lets consider the kernel with exponentiation skipped, substituted with $\mathbf{q}$ and $\mathbf{k_i}$, and expanded form:
 
 \[\text{k}(\mathbf{q}, \mathbf{k_i}) = -\frac{1}{2}\norm{\mathbf{q} - \mathbf{k_i}}^2 = \mathbf{q}^\intercal \mathbf{k_i} - \frac{1}{2}\norm{\mathbf{k_i}}^2 - \frac{1}{2}\norm{\mathbf{q}}^2\]
 The last term is constant across all values of $\mathbf{k_i}$ and due to normalization its presence don't affect the result. 
@@ -85,7 +85,7 @@ To take advantage of parallelization, vector multiplication can be replaced with
 \[\text{Attention}(Q, K, V) = \text{Softmax}(\frac{Q K^\intercal}{\sqrt{d}})V \]
 
 In practice, it was found that it is advantageous to combine multiple attention pooling outputs computed in parallel. 
-In theory it may lead to capturing different behaviours of attention mechanism, e.g. capturing short-range vs long-range dependencies within a sequence \cite{d2lMultiHeadAttention}.
+In theory it may lead to capturing different behaviours of attention mechanism, e.g. capturing short-range and long-range dependencies within a sequence \cite{d2lMultiHeadAttention}.
 
 
 A single output of attention pooling was originally referred to by the authors as a \emph{head}. 
@@ -101,7 +101,7 @@ DNN architecture used to classify XRF spectra is slightly modified version of Vi
 Most parts of the architecture remain unchanged.
 Transformer encoder (\prettyref{lst:transformer_encoder}) is implemented in exactly the same way as in original paper - \prettyref{fig:transformer-encoder}.
 In contrast to the original transformer encoder architecture \cite{Vaswani2017}, layer normalization in ViT is applied before all MHA and MLP (Multi Layer Perceptron) in order to enhance training effectiveness.
-Moreover, the commonly used non-linear activation function ReLU (Rectified Linear Unit) was replaced with its smoother counterpart, GELU (Gaussian-Error Linear Unit).
+Moreover, the commonly used non-linear activation function ReLU (Rectified Linear Unit) is replaced with its smoother counterpart, GELU (Gaussian-Error Linear Unit).
 
 \begin{figure}[H] 
   \centering     
@@ -116,11 +116,12 @@ Moreover, the commonly used non-linear activation function ReLU (Rectified Linea
     \caption{Transformer Encoder block implementation. The implementation details were based on \cite{d2lViT}}
     \label{lst:transformer_encoder}
 \end{longlistingA}
+\vspace{12pt}
 
 Several modifications were introduced in the remaining part of the original implementation - \prettyref{fig:original-vit-architecture}, \prettyref{fig:modified-vit-architecture}.
 \begin{figure}[H] 
   \centering     
-  \includegraphics[width=0.8\textwidth]{img/original_vit.png} 
+  \includegraphics[width=0.7\textwidth]{img/original_vit.png} 
   \caption{Original ViT architecture. Source: \cite{vitPaper}}
   \label{fig:original-vit-architecture}
 \end{figure}
@@ -132,12 +133,12 @@ Several modifications were introduced in the remaining part of the original impl
   \label{fig:modified-vit-architecture}
 \end{figure}
 
-The \texttt{[class]} token was removed.
+The \texttt{[class]} token has been removed.
 \texttt{[class]} token was an idea introduced in model BERT (Bidirectional Encoder Representations from Transformers) \cite{bertOriginal} and it was used as an input to classifying MLP.
 However, due to small embedding and input size it was possible to remove it and replace with fully connected layer.
 Additionally, the authors discovered that the \texttt{[class]} token was not inherently superior to other methods; other methods required just a distinct learning rate \cite{vitPaper}.
 
-Another adjustment was to replace patch embedding using \texttt{nn.Conv2d} with \texttt{nn.Conv1d}, because the input is not a 2D image but a 1D spectrum. 
+Another adjustment was to replace patch embedding using \texttt{nn.Conv2d} (2D convolution operation) with \texttt{nn.Conv1d}, because the input is not a 2D image but a 1D spectrum. 
 
 Last but not least, the softmax function was replaced with the sigmoid function to enable the classification of multiple labels simultaneously.
 
@@ -155,7 +156,7 @@ Being able to classify elements in the spectrum is only part of the success. Dat
 To address this, one of the following strategies may be used:
 \begin{enumerate}
   \item Smoothing the spectrum.
-  \item Calculating the average of multiple clustered spectra.
+  \item Calculating the average of multiple spectra.
 \end{enumerate}
 
 The first method is easy to execute; however, due to smoothing, important information may be lost or may not even exist in a single spectrum from the start. 
@@ -225,5 +226,5 @@ Although UMAP looses in performance terms to PCA (Principal Component Analysis) 
   \label{fig:umap_performance}
 \end{figure}
 
-In the next step output of UMAP may be passed to HDBSCAN, which is a followup to DBSCAN algorithm.
+After dimensionality reduction using UMAP the output may be passed to HDBSCAN, which is a followup to DBSCAN algorithm.
 The key difference between HDBSCAN and DBSCAN is that HDBSCAN can determine clusters with different densities.
