@@ -1,7 +1,7 @@
 \subsection{Real Data Preprocessing}
 Before real data can be passed to classification algorithm it ought to be preprocessed. 
 Peak positions in acquired spectrum differ from measurement to measurement - this problem has been addressed in \cite{Goral2023} master thesis.
-Basing on master thesis achievements a function for data preprocessing have been created - \prettyref{lst:data_preprocessing}:
+Basing on master thesis achievements a function for data preprocessing have been created - \prettyref{lst:data_preprocessing}.
 
 \newenvironment{longlistingF}{\captionsetup{type=listing, width=0.8\textwidth}}{}
 \begin{longlistingF}
@@ -11,10 +11,10 @@ Basing on master thesis achievements a function for data preprocessing have been
 \end{longlistingF}
 \vspace{12pt}
 
-To illustrate its inner workings, a visualization has been created (see \prettyref{fig:spectrum_preprocessing}). The following steps are taken:
+To illustrate its inner workings, a visualization will be used (see \prettyref{fig:spectrum_preprocessing}). The following steps are taken during preprocessing:
 \begin{enumerate}
     \item The channels are mapped to energy (work done in \cite{Goral2023}) and cropped if they fall outside the defined range [\texttt{min\_energy}, \texttt{max\_energy}] [KeV] (in the example below, this is not the case).
-    \item The left and right boundaries, each of size \texttt{energy\_margin} [KeV], are masked with zeros because boundaries tend to have a high amount of noise.
+    \item The left and right boundary, each of size \texttt{energy\_margin} [KeV], is masked with zeros because boundaries tend to have high amount of noise.
     \item The spectrum is padded with zeros until it fills the range [\texttt{min\_energy}, \texttt{max\_energy}].
     \item The spectrum is extrapolated on the left and right sides using the exponential function \texttt{a * np.exp(b * x)}, which is fitted using \texttt{points\_to\_extrapolate\_count} non-zero points at the ends of the spectrum.
     \item Finally, the spectrum is interpolated to the defined length \texttt{target\_length}.

@@ -119,6 +119,14 @@ Moreover, the commonly used non-linear activation function ReLU (Rectified Linea
 \vspace{12pt}
 
 Several modifications were introduced in the remaining part of the original implementation - \prettyref{fig:original-vit-architecture}, \prettyref{fig:modified-vit-architecture}.
+
+\begin{figure}[ht] 
+  \centering     
+  \includegraphics[width=0.6\textwidth]{img/vit_changed.png} 
+  \caption{Modified ViT architecture.}
+  \label{fig:modified-vit-architecture}
+\end{figure}
+
 \begin{figure}[H] 
   \centering     
   \includegraphics[width=0.7\textwidth]{img/original_vit.png} 
@@ -126,12 +134,6 @@ Several modifications were introduced in the remaining part of the original impl
   \label{fig:original-vit-architecture}
 \end{figure}
 
-\begin{figure}[H] 
-  \centering     
-  \includegraphics[width=0.6\textwidth]{img/vit_changed.png} 
-  \caption{Modified ViT architecture.}
-  \label{fig:modified-vit-architecture}
-\end{figure}
 
 The \texttt{[class]} token has been removed.
 \texttt{[class]} token was an idea introduced in model BERT (Bidirectional Encoder Representations from Transformers) \cite{bertOriginal} and it was used as an input to classifying MLP.
@@ -209,7 +211,7 @@ Because of that its basic implementation was written using python and \texttt{nu
 \subsubsection{UMAP and HDBSCAN Clustering Pipeline}
 Unfortunately, clustering the data with SOM showed some weird artifacts in all analyzed samples.
 It was the reason to find alternative clusterization method to ensure that the artifacts were not caused by the algorithm.
-After some research it was found that UMAP (Uniform Manifold Approximation and Projection) $\rightarrow$ HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) pipeline should also work with large datasets of high dimensional data. 
+After some research it was found that UMAP (Uniform Manifold Approximation and Projection) $\rightarrow$ HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) clustering pipeline should also work with large datasets of high dimensional data. 
 
 According to the UMAP documentation: ``Since UMAP does not necessarily produce clean spherical clusters something like K-Means is a poor choice. I would recommend HDBSCAN or similar. 
 The catch here is that UMAP, with its uniform density assumption, does not preserve density well. 
@@ -218,7 +220,7 @@ Providing you have enough data for UMAP to distinguish that information then you
 UMAP does offer significant improvements over algorithms like t-SNE for clustering. 
 First, by preserving more global structure and creating meaningful separation between connected components of the manifold on which the data lies, UMAP offers more meaningful clusters. \cite{umapFaq}''
 
-Although UMAP looses in performance terms to PCA (Principal Component Analysis) originally used in \cite{Lach2022} - \prettyref{fig:umap_performance}, it may provide more useful dimensional embeddings, as PCA is simple linear transformation, wheres UMAP is non-linear algorithm. 
+Although UMAP looses in performance terms (see \prettyref{fig:umap_performance}) to PCA (Principal Component Analysis) originally used in \cite{Lach2022}, it may provide more useful dimensional embeddings because PCA is simple linear transformation, wheres UMAP is non-linear algorithm. 
 \begin{figure}[H] 
   \centering     
   \includegraphics[width=0.8\textwidth]{img/performance_umap.png} 

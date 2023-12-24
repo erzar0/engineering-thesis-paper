@@ -1,0 +1,83 @@
+\section{Results}
+\subsection{Spectra Clusterization}
+Clusterization of spectrum will be presented using data gathered on ``Portrait of John III Sobieski in Karacena Scale Armour'' (see \prettyref{fig:sobieski_fragment}).
+\begin{figure}[H] 
+  \centering     
+  \includegraphics[width=0.5\textwidth]{img/jan_sobieski_w_karacenie.png} 
+  \caption{An examined fragment of ``Portrait of John III Sobieski in Karacena Scale Armour''. Source: \cite{wikimediaSobieskiPortrai} }
+  \label{fig:sobieski_fragment}
+\end{figure}
+
+\subsubsection{Clusterization With SOM}
+The first clustering algorithm, SOM, was invoked as presented in \prettyref{lst:som-invocation}.
+\newenvironment{longlistingG}{\captionsetup{type=listing, width=0.8\textwidth}}{}
+\begin{longlistingG}
+    \pythoncode{listings/som_invocation.py}
+    \caption{Invocation of SOM algorithm}
+    \label{lst:som-invocation}
+\end{longlistingG}
+\vspace{12pt}
+
+The arguments used to initialize \texttt{SelfOrganizingMap} are:
+\begin{description}
+    \item[\texttt{input\_size}:] Configured to the number of channels (4094 in this instance).
+    \item[\texttt{map\_size}:] Set to (3, 3), indicating a total of $3 \times 3 = 9$ clusters.
+    \item[\texttt{learning\_rate}:] Represents the learning rate during the first epoch.
+    \item[\texttt{sigma\_neigh}:] Sets the influence on the neighbors of the BMU. Lower values result in larger influence.
+    \item[\texttt{sigma\_decay}:] Sets the rate of decay for the learning rate. Lower values result in slower decay.
+\end{description}
+The performance of the algorithm scales linearly with the number of clusters. 
+With a total of 9 clusters, the clusterization of data with shape of (524, 348, 4094) takes approximately 6 minutes. 
+Therefore, it may not be feasible method if many more clusters were needed, at least while using basic python implementation.
+
+The result of applying clusterization on unchanged spectrum can be observed on \prettyref{fig:sobieski_clustered_som_noise}.
+
+\newpage
+\begin{figure}[H] 
+  \centering     
+  \includesvg[width=0.8\textwidth]{img/sobieski_clustered_som_noise.svg} 
+  \caption{Clusterization of unprocessed spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using SOM}
+  \label{fig:sobieski_clustered_som_noise}
+\end{figure}
+
+As the reader may notice, certain clusters are just artifacts. 
+It was sensible to investigate the possibility of these artifacts arising from a poor implementation of the SOM algorithm (although it was not the best first course of action). 
+This involved employing a UMAP to HDBSCAN pipeline to validate the clustering results.
+
+\subsubsection{Clusterization With UMAP And HDBSCAN}
+Clusterization with UMAP and HDBSCAN was invoked as presented in \prettyref{lst:umap-hdbscan-invocation}.
+
+\newenvironment{longlistingH}{\captionsetup{type=listing, width=0.8\textwidth}}{}
+\begin{longlistingH}
+    \pythoncode{listings/umap_hdbscan_invocation.py}
+    \caption{Invocation of UMAP to HDBSCAN pipeline}
+    \label{lst:umap-hdbscan-invocation}
+\end{longlistingH}
+\vspace{12pt}
+
+The meaning of arguments passed to UMAP is as follows:
+\begin{description}
+    \item[n\_neighbors:] The number of neighbors used for manifold approximation. As \texttt{n\_neighbors} increases more focus is placed on the global structure of the data. 
+    \item[min\_dist:] The minimum distance between points in the dimensional embedding. For clusterization, values around 0 are preferred, because it is desirable to transform data into "tightly packed" clumps.
+    \item[n\_components:] The number of dimensions in the low-dimensional representation. Experimentation showed that reducing dimensions to (only!) one gave the best results. 
+\end{description}
+
+Arguments for HDBSCAN are:
+\begin{description}
+    \item[min\_samples:] The number of samples in a neighborhood for a point to be considered a core point.
+    \item[min\_cluster\_size:] The minimum number of points required to form a cluster. It is probably the most important parameter; smaller values will lead to more clusters.
+    \item[metric:] The distance metric used for clustering. Euclidean distance works well, although other popular metrics also give good results.
+\end{description}
+
+Dimensionality reduction using UMAP with the presented arguments is quite costly. 
+The cost scales with the parameter \texttt{n\_neighbors} and, in this case, takes approximately 7 minutes. 
+Further clusterization with HDBSCAN is much faster (due to the really low dimensionality of input) and allows for fast experiments with different parameters. 
+It is useful mainly to achieve the desired number of clusters.
+
+It appears that although clusterization worked, it did not prevented artifacts from appearing - 
+\begin{figure}[H] 
+  \centering     
+  \includesvg[width=0.8\textwidth]{img/sobieski_clustered_hdbscan_noise.svg} 
+  \caption{Clusterization of unprocessed spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using UMAP and HDBSCAN}
+  \label{fig:sobieski_clustered_som_noise}
+\end{figure}

@@ -9,7 +9,7 @@ To generate training data, a special function has been created - \prettyref{lst:
 \newenvironment{longlistingD}{\captionsetup{type=listing, width=0.8\textwidth}}{}
 \begin{longlistingD}
     \pythoncode{listings/data_generation.py}
-    \caption{The most important arguments for data generation function}
+    \caption{Function for training data generation}
     \label{lst:data_generation}
 \end{longlistingD}
 \vspace{12pt}
@@ -28,16 +28,16 @@ Parameter \texttt{element\_lines} mentioned in \prettyref{lst:data_generation} n
 \vspace{12pt}
 
 The line intensities defined in \prettyref{lst:element_lines} are arbitrarily chosen because the author doesn't possess enough knowledge and doesn't even know if it is possible to determine the relative intensities of spectral lines theoretically. 
-Probably, the ideal action would be to not generate spectra but to use measurements of reference materials, which could then be combined as in similar fashion.
+Probably, the ideal action would be to not generate spectra but to use measurements of reference materials, which could then be combined in similar fashion.
 
 Parameters with an \texttt{err} in their name are used to define the maximum difference from the theoretical values of $\mu$ and $\sigma$. 
 The deviations are taken at random from uniform distribution $\mathcal{U}(-err, err)$.
 This augmentation should account for possible small discrepancies from theory. 
 
-There is local (affecting single peak) and global (affecting all peaks) parameter defined for $\mu$ because the relative peak positions should not change much. 
-However, the author observed that the peak position in the provided sample of a copper PCB, after correction, differed by about 0.07 keV from the theoretical value, so it may be wise to augment data for possible global translation error.
+There is local (affecting single peak) parameter defined for $\mu$, which should be small because the relative peak positions should not change much. 
+However, the author observed that the peak position in the provided sample of a copper PCB, after correction, differed by about 0.07 keV from the theoretical value, so it may be wise to augment data for possible larger, global (affecting all peaks) translation error.
 
-$\sigma$ of peak is calculated similarly as in \cite{Jones2022}, with fano factor calculated using gaussian fitted on accumulated copper plate spectrum - \prettyref{fig:fano-factor}.
+$\sigma$ of peak is calculated similarly as in \cite{Jones2022}, with fano factor calculated using gaussian fitted on accumulated spectrum of copper plate - \prettyref{fig:fano-factor}.
 
 \begin{figure}[H] 
   \centering     
@@ -51,15 +51,7 @@ where $E$ [KeV] is energy of peak , $FANO$ [-] is fano factor and $NOISE$ [KeV] 
 Although peak in \prettyref{fig:fano-factor} seem to be generated correctly, something is for sure wrong because calculated $FANO$ is about order of magnitude larger than literature says, $NOISE$ is unknown, and constant $0.00358$ is correct only for Silicon Drift Detectors.
 Further in the work it will be assumed that $\sigma$ calculation works correctly.
 
-\prettyref{fig:training_data_generation} presents stages of generation of single artificial spectrum. 
-\begin{figure}[H] 
-  \centering     
-  \includegraphics[width=1\textwidth]{img/training_data_generation_pipeline.png} 
-  \caption{Steps in generation of single training spectrum}
-  \label{fig:training_data_generation}
-\end{figure}
-
-Example generated spectra with the same elements used (copper and lead) can be seen on \prettyref{fig:sum-spectras}:
+Example spectra with signals from copper and lead can be seen in \prettyref{fig:sum-spectras}, while visualization of data generation pipeline can be found in \prettyref{fig:training_data_generation}.
 
 \begin{figure}[H] 
   \centering     
@@ -68,4 +60,9 @@ Example generated spectra with the same elements used (copper and lead) can be s
   \label{fig:sum-spectras}
 \end{figure}
 
-
+\begin{figure}[] 
+  \centering     
+  \includegraphics[width=1\textwidth]{img/generation_pipeline.png} 
+  \caption{Steps in generation of single training spectrum}
+  \label{fig:training_data_generation}
+\end{figure}
