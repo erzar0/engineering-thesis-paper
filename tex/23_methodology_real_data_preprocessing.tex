@@ -1,4 +1,5 @@
 \subsection{Real Data Preprocessing}
+\label{sec:data-preprocessing}
 Before real data can be passed to classification algorithm it ought to be preprocessed. 
 Peak positions in acquired spectrum differ from measurement to measurement - this problem has been addressed in \cite{Goral2023} master thesis.
 Basing on master thesis achievements a function for data preprocessing have been created - \prettyref{lst:data_preprocessing}.
@@ -28,4 +29,4 @@ To illustrate its inner workings, a visualization will be used (see \prettyref{f
 \end{figure}
 
 The processed spectrum can then be passed to a classifier that was trained using the same energy mapping. 
-Alternatively, the extrapolation step can be omitted; in this case, the classifier should also be trained on masked spectra or a different energy range, for example, [1, 29].
+Alternatively, the extrapolation step can be omitted; in this case, the classifier should also be trained on masked spectra or a different energy range, for example, [1, 29] KeV.

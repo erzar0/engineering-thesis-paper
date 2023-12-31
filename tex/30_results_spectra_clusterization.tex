@@ -22,20 +22,20 @@ The arguments used to initialize \texttt{SelfOrganizingMap} are:
 \begin{description}
     \item[\texttt{input\_size}:] Configured to the number of channels (4094 in this instance).
     \item[\texttt{map\_size}:] Set to (3, 3), indicating a total of $3 \times 3 = 9$ clusters.
-    \item[\texttt{learning\_rate}:] Represents the learning rate during the first epoch.
-    \item[\texttt{sigma\_neigh}:] Sets the influence on the neighbors of the BMU. Lower values result in larger influence.
-    \item[\texttt{sigma\_decay}:] Sets the rate of decay for the learning rate. Lower values result in slower decay.
+    \item[\texttt{learning\_rate}:] The learning rate during the first epoch.
+    \item[\texttt{sigma\_neigh}:] The influence on the neighbors of the BMU. Lower values result in larger influence.
+    \item[\texttt{sigma\_decay}:] The rate of decay for the learning rate. Lower values result in slower decay.
 \end{description}
 The performance of the algorithm scales linearly with the number of clusters. 
 With a total of 9 clusters, the clusterization of data with shape of (524, 348, 4094) takes approximately 6 minutes. 
-Therefore, it may not be feasible method if many more clusters were needed, at least while using basic python implementation.
+Therefore, it may not be feasible method if many more clusters were needed, at least while using basic python implementation and performing clusterization globally.
 
-The result of applying clusterization on unchanged spectrum can be observed on \prettyref{fig:sobieski_clustered_som_noise}.
+The result of applying clusterization on raw spectrum can be observed on \prettyref{fig:sobieski_clustered_som_noise}.
 
 \newpage
 \begin{figure}[H] 
   \centering     
-  \includesvg[width=0.8\textwidth]{img/sobieski_clustered_som_noise.svg} 
+  \includesvg[width=1\textwidth]{img/sobieski_clustered_som_noise.svg} 
   \caption{Clusterization of unprocessed spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using SOM}
   \label{fig:sobieski_clustered_som_noise}
 \end{figure}
@@ -57,27 +57,95 @@ Clusterization with UMAP and HDBSCAN was invoked as presented in \prettyref{lst:
 
 The meaning of arguments passed to UMAP is as follows:
 \begin{description}
-    \item[n\_neighbors:] The number of neighbors used for manifold approximation. As \texttt{n\_neighbors} increases more focus is placed on the global structure of the data. 
-    \item[min\_dist:] The minimum distance between points in the dimensional embedding. For clusterization, values around 0 are preferred, because it is desirable to transform data into "tightly packed" clumps.
-    \item[n\_components:] The number of dimensions in the low-dimensional representation. Experimentation showed that reducing dimensions to (only!) one gave the best results. 
+    \item[\texttt{n\_neighbors:}] The number of neighbors used for manifold approximation. As \texttt{n\_neighbors} increases more focus is placed on the global structure of the data. 
+    \item[\texttt{min\_dist:}] The minimum distance between points in the dimensional embedding. For clusterization, values around 0 are preferred, because it is desirable to transform data into "tightly packed" clumps.
+    \item[\texttt{n\_components:}] The number of dimensions in the low-dimensional representation. Experimentation showed that reducing dimensions to one gave the best results. 
 \end{description}
 
 Arguments for HDBSCAN are:
 \begin{description}
-    \item[min\_samples:] The number of samples in a neighborhood for a point to be considered a core point.
-    \item[min\_cluster\_size:] The minimum number of points required to form a cluster. It is probably the most important parameter; smaller values will lead to more clusters.
-    \item[metric:] The distance metric used for clustering. Euclidean distance works well, although other popular metrics also give good results.
+    \item[\texttt{min\_samples:}] The number of samples in a neighborhood for a point to be considered a core point.
+    \item[\texttt{min\_cluster\_size:}] The minimum number of points required to form a cluster. It is probably the most important parameter; smaller values will lead to more clusters.
+    \item[\texttt{metric:}] The distance metric used for clustering. Euclidean distance works well, although other popular metrics give good results too.
 \end{description}
 
-Dimensionality reduction using UMAP with the presented arguments is quite costly. 
-The cost scales with the parameter \texttt{n\_neighbors} and, in this case, takes approximately 7 minutes. 
-Further clusterization with HDBSCAN is much faster (due to the really low dimensionality of input) and allows for fast experiments with different parameters. 
-It is useful mainly to achieve the desired number of clusters.
+Dimensionality reduction using UMAP took approximately 7 minutes. 
+The cost scales with the parameter \texttt{n\_neighbors}.
+Further clusterization with HDBSCAN is much faster (due to the really low dimensionality of input) and allows for fast experiments with different parameters, e.g. to achieve the desired granularity of clusters.
 
-It appears that although clusterization worked, it did not prevented artifacts from appearing - 
+It appears that although clusterization worked, it did not prevented artifacts from appearing - see \prettyref{fig:sobieski_clustered_hdbscan_noise}.
 \begin{figure}[H] 
   \centering     
-  \includesvg[width=0.8\textwidth]{img/sobieski_clustered_hdbscan_noise.svg} 
+  \includesvg[width=1\textwidth]{img/sobieski_clustered_hdbscan_noise.svg} 
   \caption{Clusterization of unprocessed spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using UMAP and HDBSCAN}
-  \label{fig:sobieski_clustered_som_noise}
+  \label{fig:sobieski_clustered_hdbscan_noise}
+\end{figure}
+
+\newpage
+\subsubsection{Source of Clusterization Artifacts}
+The source of clusterization artifacts remains unknown as of today. 
+However, due to the nature of the artifacts, they may be attributed to a poorly implemented pinhole camera.
+Two possible implementations of a pinhole camera are demonstrated in \prettyref{fig:pinhole-camera-implementations}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{img/pinhole_camera.png}
+  \caption{1-hole pinhole camera (left) and 4-hole pinhole camera (right). Source: \cite{Lach2022}}
+  \label{fig:pinhole-camera-implementations}
+\end{figure}
+
+The details of the pinhole camera implementation used during measurements are unknown, but the artifacts strongly suggest that a 4-hole pinhole camera was used. 
+It seems that differences between pinhole cameras lead to different artifacts showing up during clusterization. 
+Fortunately, the clusterization problem turned out to is easily solvable.
+
+\newpage
+\subsubsection{Clusterization Results}
+By simply removing one hundred points from both ends of the spectrum, the results of clusterization were tremendously improved, as visible in \prettyref{fig:som-clusterization-clean} and \prettyref{fig:hdbscan-clusterization-clean}.
+
+\begin{figure}[H]
+  \centering
+  \includesvg[width=1\textwidth]{img/sobieski_clustered_som_clean.svg}
+  \caption{Clusterization of the cropped spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using SOM.}
+  \label{fig:som-clusterization-clean}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includesvg[width=1\textwidth]{img/sobieski_clustered_hdbscan_clean.svg}
+  \caption{Clusterization of the cropped spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using UMAP and HDBSCAN.}
+  \label{fig:hdbscan-clusterization-clean}
+\end{figure}
+
+\newpage
+To better understand the clusters they can be visualized on separate pictures, as shown in \prettyref{fig:som-clusters-clean} and \prettyref{fig:hdbscan-clusters-clean}.
+\begin{figure}[!htbp]
+  \centering
+  \includesvg[width=0.8\textwidth]{img/sobieski_clusters_som_clean.svg}
+  \caption{Separate clusters from SOM clusterization}
+  \label{fig:som-clusters-clean}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \centering
+  \includesvg[width=0.8\textwidth]{img/sobieski_clusters_hdbscan_clean.svg}
+  \caption{Separate clusters from UMAP and HDBSCAN clusterization}
+  \label{fig:hdbscan-clusters-clean}
+\end{figure}
+
+
+\newpage
+Spectra from each cluster can be accumulated and preprocessed (as was discussed in \prettyref{sec:data-preprocessing})  before being passed to classifier - see \prettyref{fig:som-spectra} and \prettyref{fig:hdbscan-spectra}.
+
+\begin{figure}[!htbp]
+  \centering
+  \includesvg[width=1\textwidth]{img/sobieski_spectra_som_clean.svg}
+  \caption{Processed spectra from SOM clusterization}
+  \label{fig:som-spectra}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \centering
+  \includesvg[width=1\textwidth]{img/sobieski_spectra_hdbscan_clean.svg}
+  \caption{Processed spectra from UMAP and HDBSCAN clusterization}
+  \label{fig:hdbscan-spectra}
 \end{figure}

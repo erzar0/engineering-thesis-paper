@@ -1,4 +1,4 @@
-\subsection{Training data generation}
+\subsection{Training Data Generation}
 To train a DNN in a supervised fashion, one must be in possession of labeled data. 
 Acquisition of such data is by and large beyond the scope of this thesis. 
 The only feasible way to acquire large enough amounts of data is to generate it. 
@@ -14,7 +14,7 @@ To generate training data, a special function has been created - \prettyref{lst:
 \end{longlistingD}
 \vspace{12pt}
 
-The function creates artificial spectra by adding multiple gaussians in form: \[\mathcal{N}(\mu + \mathcal{U}(-e_\mu^{\text{global}}, e_\mu^{\text{global}}) + \mathcal{U}(-e_\mu^{\text{local}}, e_\mu^{\text{local}}), \sigma + \mathcal{U}(-e_\sigma^{\text{local}}, e_\sigma^{\text{local}}))\]
+The function creates artificial spectra by adding multiple gaussians in form: \[\mathcal{N}(\mu + \mathcal{U}(-e_\mu^{\text{global}}, e_\mu^{\text{global}}) + \mathcal{U}(-e_\mu^{\text{local}}, e_\mu^{\text{local}}), \sigma + \mathcal{U}(-e_\sigma^{\text{local}}, e_\sigma^{\text{local}})),\]
 that represents a single peaks of element in spectrum, where $\mu$ is the energy of peak, $\sigma$ is the standard deviation and $e$ terms are respective error values. Additionally, the arbitrary exponential is added to the sum of gaussians to account for background radiation - it is however not ideal solution.
 
 Parameter \texttt{element\_lines} mentioned in \prettyref{lst:data_generation} needs some further explanation - it is an arbitrary data structure that keeps information about spectral lines for different elements in format shown in \prettyref{lst:element_lines}.
@@ -46,12 +46,12 @@ $\sigma$ of peak is calculated similarly as in \cite{Jones2022}, with fano facto
   \label{fig:fano-factor}
 \end{figure}
 
-$\sigma$ is calculated as: \[\sigma = \sqrt{\frac{NOISE}{2.3548} + 0.00358 \times FANO \times E}\]
+Formula for $\sigma$ is as follows: \[\sigma = \sqrt{\frac{NOISE}{2.3548} + 0.00358 \times FANO \times E}\],
 where $E$ [KeV] is energy of peak , $FANO$ [-] is fano factor and $NOISE$ [KeV] is electronic contribution to the peak width.
-Although peak in \prettyref{fig:fano-factor} seem to be generated correctly, something is for sure wrong because calculated $FANO$ is about order of magnitude larger than literature says, $NOISE$ is unknown, and constant $0.00358$ is correct only for Silicon Drift Detectors.
+Although peak in \prettyref{fig:fano-factor} seem to be generated correctly, the process is wrong at few points because calculated $FANO$ is about order of magnitude larger than literature says, $NOISE$ is unknown, and constant $0.00358$ is correct only for Silicon Drift Detectors.
 Further in the work it will be assumed that $\sigma$ calculation works correctly.
 
-Example spectra with signals from copper and lead can be seen in \prettyref{fig:sum-spectras}, while visualization of data generation pipeline can be found in \prettyref{fig:training_data_generation}.
+Example spectra with signals from copper and lead present can be seen in \prettyref{fig:sum-spectras}, while visualization of data generation pipeline can be found in \prettyref{fig:training_data_generation}.
 
 \begin{figure}[H] 
   \centering     
@@ -63,6 +63,6 @@ Example spectra with signals from copper and lead can be seen in \prettyref{fig:
 \begin{figure}[] 
   \centering     
   \includegraphics[width=1\textwidth]{img/generation_pipeline.png} 
-  \caption{Steps in generation of single training spectrum}
+  \caption{Steps in generation of example training spectrum}
   \label{fig:training_data_generation}
 \end{figure}
