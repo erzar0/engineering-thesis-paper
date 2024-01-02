@@ -1,6 +1,6 @@
 \section{Results}
 \subsection{Spectra Clusterization}
-Clusterization of spectrum will be presented using data gathered on ``Portrait of John III Sobieski in Karacena Scale Armour'' (see \prettyref{fig:sobieski_fragment}).
+Clusterization of spectra will be presented using data gathered on ``Portrait of John III Sobieski in Karacena Scale Armour'' (see \prettyref{fig:sobieski_fragment}).
 \begin{figure}[H] 
   \centering     
   \includegraphics[width=0.5\textwidth]{img/jan_sobieski_w_karacenie.png} 
@@ -40,8 +40,8 @@ The result of applying clusterization on raw spectrum can be observed on \pretty
   \label{fig:sobieski_clustered_som_noise}
 \end{figure}
 
-As the reader may notice, certain clusters are just artifacts. 
-It was sensible to investigate the possibility of these artifacts arising from a poor implementation of the SOM algorithm (although it was not the best first course of action). 
+As the reader may notice, certain clusters are artificial. 
+It was sensible to investigate the possibility of the artifacts arising from a poor implementation of the SOM algorithm.
 This involved employing a UMAP to HDBSCAN pipeline to validate the clustering results.
 
 \subsubsection{Clusterization With UMAP And HDBSCAN}
@@ -96,7 +96,7 @@ Two possible implementations of a pinhole camera are demonstrated in \prettyref{
 
 The details of the pinhole camera implementation used during measurements are unknown, but the artifacts strongly suggest that a 4-hole pinhole camera was used. 
 It seems that differences between pinhole cameras lead to different artifacts showing up during clusterization. 
-Fortunately, the clusterization problem turned out to is easily solvable.
+Fortunately, the clusterization problem turned out to be easily solvable.
 
 \newpage
 \subsubsection{Clusterization Results}
@@ -134,7 +134,8 @@ To better understand the clusters they can be visualized on separate pictures, a
 
 
 \newpage
-Spectra from each cluster can be accumulated and preprocessed (as was discussed in \prettyref{sec:data-preprocessing})  before being passed to classifier - see \prettyref{fig:som-spectra} and \prettyref{fig:hdbscan-spectra}.
+\label{sec:clustered-spectra}
+Spectra from each cluster were accumulated and preprocessed (as was discussed in \prettyref{sec:data-preprocessing}) before being passed to classifier - see \prettyref{fig:som-spectra} and \prettyref{fig:hdbscan-spectra}.
 
 \begin{figure}[!htbp]
   \centering

@@ -227,13 +227,5 @@ Providing you have enough data for UMAP to distinguish that information then you
 UMAP does offer significant improvements over algorithms like t-SNE for clustering. 
 First, by preserving more global structure and creating meaningful separation between connected components of the manifold on which the data lies, UMAP offers more meaningful clusters. \cite{umapFaq}''
 
-Although UMAP looses in performance terms (see \prettyref{fig:umap_performance}) to PCA (Principal Component Analysis) originally used in \cite{Lach2022}, it may provide more useful dimensional embeddings because PCA is simple linear transformation, wheres UMAP is non-linear algorithm. 
-\begin{figure}[htbp!] 
-  \centering     
-  \includegraphics[width=0.8\textwidth]{img/performance_umap.png} 
-  \caption{UMAP is characterized by good performance. Source: \cite{umapPerformance}}
-  \label{fig:umap_performance}
-\end{figure}
-
 After dimensionality reduction using UMAP the output may be passed to HDBSCAN, which is a followup to DBSCAN algorithm.
 The key difference between HDBSCAN and DBSCAN is that HDBSCAN can determine clusters with different densities.
