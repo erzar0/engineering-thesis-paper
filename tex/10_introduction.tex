@@ -37,7 +37,7 @@ A potential solution to these problems may be to shift the focus from classifyin
 \subsubsection{Physics fundations}
 The XRF method utilizes X-ray radiation to irradiate objects, causing them to emit photons that are specific to each present element.
 Characteristic X-ray fluorescence radiation is type of secondary radiation generated in matter under the influence of radiation from an external source - X-ray tube in research setting.
-The method is considered harmless when used in small doses and low intensity.  
+The method is considered harmless when used over short periods of time.  
 Therefore, it can be used to study delicate objects, such as art, monuments, geological and biological samples.
 
 The fundamental physics behind the whole process is the phenomenon of photoelectric absorption.
@@ -63,7 +63,7 @@ Therefore, having \emph{a priori} knowledge about energies of specific spectral 
     \put(35,-3){\textcolor{black}{Atomic number Z [-]}}
   \end{overpic}
   \vspace{10pt}
-  \caption{The dependence of the energy [KeV] of photons  emitted due to transitions of electrons from the L to K level (K$_\alpha$ spectral line) and M to L level (L$_\alpha$ spectral line) as a function of the atomic number Z [-]. Source: \cite{Lach2022}} 
+  \caption{The dependence of the energy of photons  emitted due to transitions of electrons from the L to K level (K$_\alpha$ spectral line) and M to L level (L$_\alpha$ spectral line) as a function of the atomic number Z. Source: \cite{Lach2022}} 
   \label{fig:photons_energy}
 \end{figure}
 
@@ -78,7 +78,7 @@ Emission of these electrons is an undesirable effect in context of XRF, as it is
 
 \subsubsection{Imaging techniques}
 XRF is primarily employed for quantitative measurements of elements in studied samples. 
-Handheld scanners with high energy resolution are available on the market, suitable for simple measurements of elements present in metal alloys, geodes and other materials. 
+Handheld scanners with high energy resolution are available on the market and suitable for simple measurements of elements present in metal alloys, geodes and other materials. 
 However, if one is interested in spatial imaging, device like that will (probably) not suffice. 
 The demand for spatial imaging led to the evolution of X-ray scanning microscopy - see \prettyref{fig:ma-xrf}.
 
@@ -119,13 +119,13 @@ On the brighter side:
 
 Due to the demand for eliminating weaknesses in MA-XRF, an alternative method has been developed - FF-XRF (Full-Field X-Ray Fluorescence). 
 It is characterized by replacing polycapillary optics with a wide, homogenous beam of radiation paired with a pinhole camera. 
-This combination guarantees the highest possible depth of field, enabling the scanning of uneven surfaces and 3D objects. 
+This combination guarantees high depth of field, enabling the scanning of uneven surfaces and 3D objects. 
 When combined with good position-sensitive detector, it allows for scanning multiple points of surface simultaneously.
 However, in contrary to the MA-XRF, choosing the right detector is very tricky.
 Detectors with good spatial resolution are lacking in terms of energetic resolution.
 For this specific use case, choosing the best detector was challenging, but in the end, it was decided to use slightly modified GEM (Gas Electron Multiplier) detector. Implementation of FF-XRF can be seen on \prettyref{fig:ff-xrf}.
 
-\begin{figure}[h] 
+\begin{figure}[htbp!] 
   \centering     
       \begin{subfigure}{0.5\linewidth}
       \includegraphics[width=1\textwidth]{img/detart.png} 

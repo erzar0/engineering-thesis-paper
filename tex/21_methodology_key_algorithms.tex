@@ -15,7 +15,7 @@ As a result it is hard to degrade performance of this architecture with increasi
   \label{fig:residual-block}
 \end{figure}
 
-However, the original architecture of ResNet incorporates a \emph{Global Average Pooling} operation just before the final fully connected layer. 
+However, the original architecture of ResNet incorporates a \emph{global average pooling} operation just before the final fully connected layer. 
 This operation calculates the average value over the spatial dimensions of a single feature map. 
 In the case of adapting ResNet to work with 1D spectra, the input for global average pooling has a shape of (batch\_size, channels, features) and the output has shape (batch\_size, channels, 1). 
 It means that due to averaging over features the spatial information is lost!
@@ -31,7 +31,7 @@ To address this problem, several possibilities were considered:
     \item Opting for a completely different architecture.
 \end{enumerate}
 
-While the choice of model was not crucial for this work, and size of the ResNet fully connected layer could have been easily changed, the decision was made to change used architecture completely. 
+While the two first options vere feasible, the decision was made to change used architecture completely. 
 As a result, the author chose to use the ViT (Vision Transformer).
 
 \subsubsection{Multi-Head Attention}
@@ -42,7 +42,7 @@ In contrast, transformers exhibit less inductive biases, enabling them to explor
 Consequently, they may converge to local optima and generalize poorly on unseen data, when trained on insufficient data.}) 
 than recurrent networks to achieve similar results, they have significant advantage in terms of parallelization.
 
-Unlike classic RNNs, which require the use of the hidden state calculated at time step $t-1$ to compute the hidden state at time step $t$, which makes them non-parallelizable, transformers are highly parallelized, thanks to \emph{Multi-Head Attention}, which makes heavy use of matrix multiplication.
+Unlike classic RNNs, which require the use of the hidden state calculated at time step $t-1$ to compute the hidden state at time step $t$, which makes them non-parallelizable, transformers are highly parallelized, thanks to \emph{multi-head attention}, which makes heavy use of matrix multiplication.
 
 Multi-Head Attention works based on \emph{attention mechanism}, which is somewhat similar to a database query \cite{d2lAttentionMechanism}.
 To explain it let's define a key-value database consisting of $(\mathbf{k}, \textbf{v})$ vector pairs which can be queried using $\mathbf{q}$ vector query: \[ D\overset{\text{def}}{=}\{(\mathbf{k_i}, \mathbf{v_i}) \mid i = 1, 2, \ldots, n\}.\]
@@ -59,7 +59,7 @@ For deep learning applications the following properties are desirable: $\sum_i \
 The last thing to be defined is the attention scoring function $\text{a}(\mathbf{q}, \mathbf{k_i})$.
 It is highly unlikely to find any exact match between $\mathbf{q}$ and $\mathbf{k_i}$, so $\text{a}(\mathbf{q}, \mathbf{k_i})$ must be defined as some similarity function between vectors in feature space.
 
-Let's take a look at Gaussian similarity kernel, which is non-linear function of euclidean distance:
+Let's take a look at Gaussian similarity kernel, which is a non-linear function of euclidean distance:
 \[\text{K}(\mathbf{x}, \mathbf{x'}) = \text{exp}(-\frac{\norm{\mathbf{x} - \mathbf{x'}}}{2\sigma}).\]
 It has nice property of being bound between zero and one, unlike euclidean distance which could be anything and lead to numerical instabilities.
 However, it has disadvantage of being computationally costly.
@@ -72,14 +72,14 @@ Therefore, it can be safely omitted.
 Similarly, the second term may be disregarded because batch/layer normalization effectively bounds $\norm{\mathbf{k_i}}$, ensuring a negligibly small impact on the final result \cite{d2lAttentionScoring}.
 
 If we assume that $q \in \mathbb{R}^{d}$ and $k_i \in \mathbb{R}^d$, and that their elements are drawn from distribution $\mathcal{N}(\mu=0, \sigma^2=1)$, then their dot product will have mean zero and variance $d$.
-After normalization by factor $\frac{1}{\sqrt{d}}$, the first commonly used attention function - \emph{scaled dot product attention} \cite{Vaswani2017} can be written as:
+After normalization by factor $\frac{1}{\sqrt{d}}$, the first commonly used attention function - \emph{scaled dot product attention} \cite{Vaswani2017} can be written down as:
 
 \[\text{a}(\mathbf{q}, {\mathbf{k_i}}) = \frac{\mathbf{q}^\intercal \mathbf{k_i}}{\sqrt{d}}.\]
 Final attention weights can be calculated by applying Softmax: 
 
 \[\alpha(\mathbf{q}, \mathbf{k_i}) = \text{Softmax}(\text{a}(\mathbf{q}, \mathbf{k_i})) =\frac{\text{exp}(\frac{q^\intercal k_i}{\sqrt{d}})}{\sum_j \text{exp}(\frac{q^\intercal k_j}{\sqrt{d}})}.\]
 
-To take advantage of parallelization, vector multiplication can be replaced with matrix multiplication. When computing attention for $n$ queries and $m$ key-value pairs, where both queries and keys have a length of $d_k$ (although it must not necessarily be the case), and values have a length of $d_v$, the following matrices must be defined: $Q \in \mathbb{R}^{n \times d_k}$, $K \in \mathbb{R}^{m \times d_k}$, and $V \in \mathbb{R}^{m \times d_v}$. These matrices will form an equation analogous to that of vectors:
+To take advantage of parallelization, vector multiplication can be replaced with matrix multiplication. When computing attention for $n$ queries and $m$ key-value pairs, where both queries and keys have a length of $d_k$ (although it must not necessarily be the case), and values have a length of $d_v$, the following matrices must be defined: $Q \in \mathbb{R}^{n \times d_k}$, $K \in \mathbb{R}^{m \times d_k}$, and $V \in \mathbb{R}^{m \times d_v}$. These matrices will form a formula analogous to that of vectors:
 
 \[\text{Attention}(Q, K, V) = \text{Softmax}(\frac{Q K^\intercal}{\sqrt{d}})V.\]
 
@@ -88,7 +88,7 @@ In theory it may lead to capturing different behaviours of attention mechanism, 
 
 
 A single output of attention pooling was originally referred to by the authors as a \emph{head}. 
-Multi-Head Attention can be calculated in following way: 
+multi-head attention can be calculated in following way: 
 \[\text{MultiHeadAttention}(Q, K, V)  = \text{Concat}(head_1, head_2, \dots, head_n)W^O,\]
 where $head_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V) \in \mathbb{R}^{p_v}$, where $W_i^Q \in \mathbb{R}^{d_k \times p_k}$, $W_i^K \in \mathbb{R}^{d_k \times p_k}$, $W_i^V \in \mathbb{R}^{d_v \times p_v}$ and $W_i^O \in \mathbb{R}^{(hp_v) \times p_o}$ are learnable parameters.
 To better manage computational cost, the input sizes for each head are parameterized in following manner: $p_k = p_v = p_o / h$, where $h$ is number of heads and $p_o$ is size of output of last fully connected layer. Thanks to that, computational cost don't increase with higher number of heads.
@@ -117,7 +117,7 @@ Moreover, the commonly used non-linear activation function ReLU (Rectified Linea
 \end{longlistingA}
 \vspace{12pt}
 
-Several modifications were introduced in the remaining part of the original implementation - \prettyref{fig:original-vit-architecture}, \prettyref{fig:modified-vit-architecture}.
+Several modifications were introduced in the remaining part (\prettyref{lst:vit}) of the original implementation - \prettyref{fig:original-vit-architecture}, \prettyref{fig:modified-vit-architecture}.
 
 \begin{figure}[ht] 
   \centering     
@@ -153,7 +153,7 @@ Last but not least, the softmax function was replaced with the sigmoid function 
 
 \subsubsection{Self-Organizing Map}
 Being able to classify elements in the spectrum is only part of the success. 
-Data gathered using FF-XRF has a mean of around 20,000 photon counts per one spatial coordinate. 
+Data gathered using FF-XRF has a mean of around 20,000 photon counts per one spatial coordinate - see \prettyref{fig:matka-boska-photon-count}. 
 When distributed over $\sim$4000 possible energy levels, it provides a rather noisy spectrum that may not yield correct classification. 
 It would also come with long total inference time. 
 
@@ -164,10 +164,10 @@ It would also come with long total inference time.
   \label{fig:matka-boska-photon-count}
 \end{figure}
 
-To address this issues, one of the following strategies may be used:
+To address this issues, one of the following strategies may be involved:
 \begin{enumerate}
-  \item Calculating the average over small region of data.
-  \item Calculating the average over clustered spectra.
+  \item Calculating the average of spectra in some small region.
+  \item Calculating the average of clustered spectra.
 \end{enumerate}
 
 The first option is easier because clustering high-dimensional data is a daunting task due to the \emph{curse of dimensionality}.
@@ -189,7 +189,7 @@ The algorithm works in the following way \cite{somTutorial}:
 
 The weights are updated using following equation \cite{somWikipedia}:
 \[\mathbf{w}_i^{s+1} = \mathbf{w}_i^s + \theta(u, v, s) \cdot \alpha(s) \cdot (\mathbf{d} - \mathbf{w}_i^s).\]
-Here, $s$ represents the number of iterations, $u$ is the index of the BMU and $v$ is the index of the node on the map (may be the same as $u$). 
+Here, $s$ represents the number of iterations, $u$ the index of the BMU and $v$ the index of the node on the map (may be the same as $u$). 
 The function $\theta(u, v, s)$ represents the neighborhood function and states that the BMU is updated the most and farther neighbors are updated less. 
 An example of a neighborhood function could be a Gaussian kernel. 
 The function $\alpha(s)$ represents the learning rate schedule.
@@ -220,12 +220,13 @@ Unfortunately, clustering the data with SOM showed some weird artifacts in all a
 It was the reason to find alternative clusterization method to ensure that the artifacts were not caused by the algorithm.
 After some research it was found that UMAP (Uniform Manifold Approximation and Projection) $\rightarrow$ HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) clustering pipeline should also work with large datasets of high dimensional data. 
 
-According to the UMAP documentation: ``Since UMAP does not necessarily produce clean spherical clusters something like K-Means is a poor choice. I would recommend HDBSCAN or similar. 
-The catch here is that UMAP, with its uniform density assumption, does not preserve density well. 
-What UMAP will do, however, is contract connected components of the manifold together. 
-Providing you have enough data for UMAP to distinguish that information then you can get useful clustering results out since algorithms like HDBSCAN will easily pick out the components after applying UMAP.
-UMAP does offer significant improvements over algorithms like t-SNE for clustering. 
-First, by preserving more global structure and creating meaningful separation between connected components of the manifold on which the data lies, UMAP offers more meaningful clusters. \cite{umapFaq}''
+According to the UMAP documentation it does not produce clean, spherical clusters, so algorithms like K-Means dont't work well on its output. 
+UMAP comes with uniform density assumption, so density is not preserved correctly. 
+However, UMAP contracts connected components of the manifold together, which should be easily picked out by algorithms like HDBSCAN.
+It offers significant improvements over algorithms like t-SNE for clustering, as it preserves more global structure and creates meaningful separation between connected components, resulting in more meaningful clusters \cite{umapFaq}. 
 
-After dimensionality reduction using UMAP the output may be passed to HDBSCAN, which is a followup to DBSCAN algorithm.
-The key difference between HDBSCAN and DBSCAN is that HDBSCAN can determine clusters with different densities.
+The HDBSCAN algorithm is a follow-up to the DBSCAN algorithm. 
+The key distinction between HDBSCAN and DBSCAN lies in HDBSCAN's ability to determine clusters with different densities.
+
+Due to the complexity of these algorithms and the author's lack of familiarity with topology, further explanation of the algorithms will not be provided here. 
+Interested readers can refer to their respective papers \cite{Campello2013}, \cite{McInnes2018}, or their documentation.

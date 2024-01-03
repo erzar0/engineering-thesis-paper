@@ -27,7 +27,7 @@ The arguments used to initialize \texttt{SelfOrganizingMap} are:
     \item[\texttt{sigma\_decay}:] The rate of decay for the learning rate. Lower values result in slower decay.
 \end{description}
 The performance of the algorithm scales linearly with the number of clusters. 
-With a total of 9 clusters, the clusterization of data with shape of (524, 348, 4094) takes approximately 6 minutes. 
+With a total of 9 clusters, the clusterization of data with shape of (524, 348, 4094) took approximately 6 minutes. 
 Therefore, it may not be feasible method if many more clusters were needed, at least while using basic python implementation and performing clusterization globally.
 
 The result of applying clusterization on raw spectrum can be observed on \prettyref{fig:sobieski_clustered_som_noise}.
@@ -36,7 +36,7 @@ The result of applying clusterization on raw spectrum can be observed on \pretty
 \begin{figure}[H] 
   \centering     
   \includesvg[width=1\textwidth]{img/sobieski_clustered_som_noise.svg} 
-  \caption{Clusterization of unprocessed spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using SOM}
+  \caption{Clusterization of unprocessed spectra of ``Portrait of John III Sobieski in Karacena Scale Armour'' using SOM}
   \label{fig:sobieski_clustered_som_noise}
 \end{figure}
 
@@ -57,7 +57,7 @@ Clusterization with UMAP and HDBSCAN was invoked as presented in \prettyref{lst:
 
 The meaning of arguments passed to UMAP is as follows:
 \begin{description}
-    \item[\texttt{n\_neighbors:}] The number of neighbors used for manifold approximation. As \texttt{n\_neighbors} increases more focus is placed on the global structure of the data. 
+    \item[\texttt{n\_neighbors:}] The number of neighbors used for manifold approximation. As \texttt{n\_neighbors} places more focus is placed on the global structure of the data. 
     \item[\texttt{min\_dist:}] The minimum distance between points in the dimensional embedding. For clusterization, values around 0 are preferred, because it is desirable to transform data into "tightly packed" clumps.
     \item[\texttt{n\_components:}] The number of dimensions in the low-dimensional representation. Experimentation showed that reducing dimensions to one gave the best results. 
 \end{description}
@@ -70,14 +70,14 @@ Arguments for HDBSCAN are:
 \end{description}
 
 Dimensionality reduction using UMAP took approximately 7 minutes. 
-The cost scales with the parameter \texttt{n\_neighbors}.
+The computational cost scales with the parameter \texttt{n\_neighbors}.
 Further clusterization with HDBSCAN is much faster (due to the really low dimensionality of input) and allows for fast experiments with different parameters, e.g. to achieve the desired granularity of clusters.
 
 It appears that although clusterization worked, it did not prevented artifacts from appearing - see \prettyref{fig:sobieski_clustered_hdbscan_noise}.
 \begin{figure}[H] 
   \centering     
   \includesvg[width=1\textwidth]{img/sobieski_clustered_hdbscan_noise.svg} 
-  \caption{Clusterization of unprocessed spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using UMAP and HDBSCAN}
+  \caption{Clusterization of unprocessed spectra of ``Portrait of John III Sobieski in Karacena Scale Armour'' using UMAP and HDBSCAN}
   \label{fig:sobieski_clustered_hdbscan_noise}
 \end{figure}
 
@@ -95,7 +95,7 @@ Two possible implementations of a pinhole camera are demonstrated in \prettyref{
 \end{figure}
 
 The details of the pinhole camera implementation used during measurements are unknown, but the artifacts strongly suggest that a 4-hole pinhole camera was used. 
-It seems that differences between pinhole cameras lead to different artifacts showing up during clusterization. 
+It seems that differences between pinhole cameras lead to different artifacts showing up in spectra, which lead to artificial clusters being found. 
 Fortunately, the clusterization problem turned out to be easily solvable.
 
 \newpage
@@ -105,14 +105,14 @@ By simply removing one hundred points from both ends of the spectrum, the result
 \begin{figure}[H]
   \centering
   \includesvg[width=1\textwidth]{img/sobieski_clustered_som_clean.svg}
-  \caption{Clusterization of the cropped spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using SOM.}
+  \caption{Clusterization of the cropped spectra of ``Portrait of John III Sobieski in Karacena Scale Armour'' using SOM}
   \label{fig:som-clusterization-clean}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includesvg[width=1\textwidth]{img/sobieski_clustered_hdbscan_clean.svg}
-  \caption{Clusterization of the cropped spectrum of ``Portrait of John III Sobieski in Karacena Scale Armour'' using UMAP and HDBSCAN.}
+  \caption{Clusterization of the cropped spectra of ``Portrait of John III Sobieski in Karacena Scale Armour'' using UMAP and HDBSCAN}
   \label{fig:hdbscan-clusterization-clean}
 \end{figure}
 

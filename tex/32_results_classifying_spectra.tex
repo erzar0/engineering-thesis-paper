@@ -1,6 +1,6 @@
 \subsection{Classifying Spectra}
 \subsubsection{Simple Spectrum Classification}
-After training the model was tested on a ``base case'', that is accumulated spectrum of copper PCB as shown in \prettyref{fig:spectra-comparison}.
+After training the model was tested on a ``base case'', that is accumulated spectrum of copper PCB shown in \prettyref{fig:spectra-comparison}.
 The output probabilities are visible on \prettyref{fig:copper-pcb-classification}.
 
 \begin{figure}[H]
@@ -18,30 +18,30 @@ The output probabilities are visible on \prettyref{fig:copper-pcb-classification
   \label{fig:copper-pcb-classification}
 \end{figure}
 
-In this simple case, the results are satisfactory.
+For this simple case, the results are satisfactory.
 
 \subsubsection{Classification Of Clustered Spectra}
-Now, considering that the model is far from ideal, the results of clustered spectra classification will be shown. 
+Now, while having in mind that the model is far (\textbf{f a r}) from ideal, the results of clustered spectra classification can be presented. 
 Spectra were clustered, accumulated and preprocessed as presented in \prettyref{sec:clustered-spectra}.
 In the last step they were classified and probability maps for each element were visualized.
-Due to probabilistic nature the maps they do not provide any quantitative information! 
+Due to probabilistic nature the maps they do not provide any quantitative information about elements.
 Results are visible in \prettyref{fig:clusters-prob-sobieski}, \prettyref{fig:clusters-prob-gasecki} and \prettyref{fig:clusters-prob-matka-boska}.
 
-\begin{figure}[htbp!]
+\begin{figure}[H]
   \centering
   \includesvg[width=1\textwidth]{img/prediction_on_clusters_sobieski.svg}
   \caption{Probability maps of clustered spectra of ``Portrait of John III Sobieski in Karacena Scale Armour''}
   \label{fig:clusters-prob-sobieski}
 \end{figure}
 
-\begin{figure}[htbp!]
+\begin{figure}[H]
   \centering
   \includesvg[width=1\textwidth]{img/prediction_on_clusters_gasecki.svg}
   \caption{Probability maps of clustered spectra of ``Portrait of Mieczysław Gąsecki''}
   \label{fig:clusters-prob-gasecki}
 \end{figure}
 
-\begin{figure}[htbp!]
+\begin{figure}[H]
   \centering
   \includesvg[width=1\textwidth]{img/prediction_on_clusters_matka_boska.svg}
   \caption{Probability maps of clustered spectra of ``Mother of
@@ -51,8 +51,8 @@ God with the Child Eating an Apple''}
 
 As expected, many false positives appeared in probability maps.
 On the other hand results are not \emph{very} tragic. 
-As one can see in \prettyref{fig:lach-comparison}, Pb was detected pretty well.
-Little worse, but Fe was also registered in places of higher concentration.
+As one can see in \prettyref{fig:lach-comparison}, Pb was detected pretty well in places of higher concentration.
+Little worse, but Fe was also registered.
 Cu was mostly registered incorrectly because the escape photons of the $L_{\alpha}$ spectral line of Pb (7.59 keV) have energy close to the $K_{\alpha}$ line (8.05 keV) of Cu. 
 This particular line was not included in the training process, so adding it could potentially improve the results.
 
@@ -65,8 +65,8 @@ This particular line was not included in the training process, so adding it coul
 
 \subsubsection{Classification Of Small Regions}
 Another option was to classify single spectra or spectra averaged over small regions, e.g. $10\times10$ points. 
-Savitzky–Golay filter was used to smooth spectra before further processing.
-Also, extrapolation step was omitted during preprocessing to reduce computational cost.
+
+Savitzky–Golay filter implementation from \texttt{scipy} package was used to smooth spectra before further processing. Extrapolation step was omitted to reduce computational cost and issues with extrapolation of noisy spectra.
 Example spectra are shown in \prettyref{fig:spectra}.
 
 \begin{figure}[H]
@@ -93,7 +93,9 @@ Example spectra are shown in \prettyref{fig:spectra}.
     \label{fig:spectra}
 \end{figure}
 
-Resulting probability maps for different options are shown in \prettyref{fig:10x10-point-sobieski}, \prettyref{fig:5x5-point-sobieski} and \prettyref{fig:single-point-sobieski}.
+It is clearly visible that averaging over larger regions yield much clearer spectra, but it must be kept in mind that spatial resolution is lost in this way.
+
+Resulting probability maps for different region sizes are shown in \prettyref{fig:10x10-point-sobieski}, \prettyref{fig:5x5-point-sobieski} and \prettyref{fig:single-point-sobieski}.
 
 \begin{figure}[htbp!]
   \centering
@@ -109,9 +111,31 @@ Resulting probability maps for different options are shown in \prettyref{fig:10x
   \label{fig:5x5-point-sobieski}
 \end{figure}
 
-\begin{figure}[htbp!]
+\newpage
+\begin{figure}[H]
   \centering
   \includesvg[width=1\textwidth]{img/prediction_on_single_spectra.svg}
   \caption{Probability maps calculated over single points of ``Portrait of John III Sobieski in Karacena Scale Armour''}
   \label{fig:single-point-sobieski}
+\end{figure}
+It seems that despite the author's concerns classifying single works quite good.
+As \prettyref{fig:single-point-sobieski} shows, it is the only case when the model succeeded to somehow register Hg element, which was invisible in \prettyref{fig:lach-comparison}.
+However, it took a lot of time. 
+Inference of all spectra took approximately 20 minutes on T4 GPU for this fairly small model ($10^6$ parameters).
+
+Similar probability maps of another two paintings are visible on \prettyref{fig:single-point-gasecki} and \prettyref{fig:single-point-matka-boska}.
+
+\begin{figure}[htbp!]
+  \centering
+  \includesvg[width=1\textwidth]{img/prediction_on_single_spectrum_gasecki.svg}
+  \caption{Probability maps calculated over single points of ``Portrait of Mieczysław Gąsecki''}
+  \label{fig:single-point-gasecki}
+\end{figure}
+
+\begin{figure}[htbp!]
+  \centering
+  \includesvg[width=1\textwidth]{img/prediction_on_single_spectrum_matka_boska.svg}
+  \caption{Probability maps calculated over single points of ``Mother of
+God with the Child Eating an Apple''}
+  \label{fig:single-point-matka-boska}
 \end{figure}

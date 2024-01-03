@@ -1,7 +1,12 @@
 \begin{abstract}
-During recent years, deep learning models have proven their usability in numerous tasks that cannot be easily modeled using classic methods. 
-In the meantime, a novel method for non-invasive XRF (X-Ray Fluorescence) data acquisition has been developed. 
-Although algorithms with proven efficacy for analyzing XRF data already exist, and unlike deep learning models, they are easily explainable, they also have shortcomings. 
-For instance, the commonly used ROI (Region of Interest) technique encounters difficulties in detecting elements invisible in accumulated spectra, differentiating signals with very similar characteristic energies and obtaining information about their actual distribution in the signal. 
-This thesis presents an attempt to create a ViT (Vision Transformer) based model for multi label classification of chemical elements present in spectra measured with XRF.
+In recent years, the application of deep learning models has demonstrated remarkable efficacy in addressing complex tasks that were beyond the reach of traditional methods. 
+Meanwhile, a novel method for non-invasive X-Ray Fluorescence (XRF) data acquisition has been developed. 
+Despite the existence of algorithms for XRF data analysis, there is still a need for an algorithm that could surpass their limitations. 
+For instance, the widely-used Region of Interest (ROI) technique encounters difficulties in detecting invisible elements within spectra, differentiating signals with closely resembling characteristic energies, and providing information about their true distribution within the spectrum.
+
+This thesis presents an effort to develop a Vision Transformer (ViT)-based model for the multi-label classification of chemical elements within XRF spectra. 
+The classification process was supported by clustering spectra to mitigate their noisiness, generating artificial data for model training in the absence of real labeled data, and implementing a preprocessing pipeline aimed at ensuring reliable results.
+
+Although the trained model fell short of surpassing established methods, it offers hope that with greater effort, it could become a reliable solution.
 \end{abstract}
+
