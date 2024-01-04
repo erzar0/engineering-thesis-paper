@@ -193,17 +193,17 @@ Here, $s$ represents the number of iterations, $u$ the index of the BMU and $v$ 
 The function $\theta(u, v, s)$ represents the neighborhood function and states that the BMU is updated the most and farther neighbors are updated less. 
 An example of a neighborhood function could be a Gaussian kernel. 
 The function $\alpha(s)$ represents the learning rate schedule.
+Graphical representation of weights update step can be seen in \prettyref{fig:som}.
 
 Although algorithm is fairly simple, the most popular python packages don't have its implementation, and the most popular implementation - package \texttt{minisom} had too large RAM memory requirements, which lead to crashing Colab environment with 50GB of memory.
 Because of that its basic implementation was written using python and \texttt{numpy} package - \prettyref{lst:som}. 
 
-\newenvironment{longlistingB}{\captionsetup{type=listing, width=0.8\textwidth}}{}
-
-\begin{longlistingB}
+\newpage
+\begin{listing}[H]
     \pythoncode{listings/som.py}
-    \caption{Simple Self-Organizing Map implementation. Graphical representation of weights update step can be seen in \prettyref{fig:som}}
+    \caption{Simple Self-Organizing Map implementation}
     \label{lst:som}
-\end{longlistingB}
+\end{listing}
 \vspace{12pt}
 
 \begin{figure}[H] 
@@ -215,18 +215,18 @@ Because of that its basic implementation was written using python and \texttt{nu
     \label{fig:som}
 \end{figure}
 
+
 \subsubsection{UMAP and HDBSCAN Clustering Pipeline}
 Unfortunately, clustering the data with SOM showed some weird artifacts in all analyzed samples.
 It was the reason to find alternative clusterization method to ensure that the artifacts were not caused by the algorithm.
 After some research it was found that UMAP (Uniform Manifold Approximation and Projection) $\rightarrow$ HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) clustering pipeline should also work with large datasets of high dimensional data. 
 
-According to the UMAP documentation it does not produce clean, spherical clusters, so algorithms like K-Means dont't work well on its output. 
-UMAP comes with uniform density assumption, so density is not preserved correctly. 
-However, UMAP contracts connected components of the manifold together, which should be easily picked out by algorithms like HDBSCAN.
-It offers significant improvements over algorithms like t-SNE for clustering, as it preserves more global structure and creates meaningful separation between connected components, resulting in more meaningful clusters \cite{umapFaq}. 
+UMAP is an algorithm for dimension reduction based on manifold learning techniques.
+It comes with uniform density assumption, so density is not preserved correctly. 
+However, according to the documentation UMAP output should be easily clustered by HDBSCAN algorithm \cite{umapFaq}, which is density based algorithm. 
 
 The HDBSCAN algorithm is a follow-up to the DBSCAN algorithm. 
-The key distinction between HDBSCAN and DBSCAN lies in HDBSCAN's ability to determine clusters with different densities.
+The key distinction between HDBSCAN and DBSCAN lies in HDBSCAN's ability to determine clusters of different densities.
 
 Due to the complexity of these algorithms and the author's lack of familiarity with topology, further explanation of the algorithms will not be provided here. 
-Interested readers can refer to their respective papers \cite{Campello2013}, \cite{McInnes2018}, or their documentation.
+Interested readers can refer to their respective documentation pages \cite{umapDocs}, \cite{hdbscanDocs}.

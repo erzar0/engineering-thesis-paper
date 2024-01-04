@@ -1,5 +1,17 @@
 \section{Conclusion}
-In conclusion, this engineering thesis has sought to address problem of classifying elements present in XRF spectra. 
+In conclusion, this engineering thesis has sought to address problem of classifying elements present in XRF spectra, utilizing deep learning methods.
+Originally, the ResNet architecture was selected for its proven robustness. 
+However, its utilization of global average pooling resulted in the loss of spatial information and poor performance. 
+Consequently, it was replaced with the Visual Transformer-based architecture.
+
+The classification process was supported by preprocessing real spectra to ensure reliable classification and artificial data generation in order to train the model in the absence of real labeled data. 
+Clusterization of spectra was employed as an attempt to deal with spectra noisiness, although its significance proved to be less crucial than author expected.
+
+The trained model demonstrated effectiveness on artificial data and some success on real data. 
+However, issues such as too many false positive cases and overall low quality of classification persist. 
+To address these issues, future efforts could focus on generating more accurate theoretical spectra or, preferably, using real spectra from reference materials to generate training data that could take into account the characteristics of the data acquisition apparatus.
+Additionally, the model, hyperparameters, and training process still could be improved as the results presented in this work were slightly less effective, than the best trained model. 
+The investigation of potential issues with the pinhole camera, as mentioned in Section \prettyref{sec:pinhole-camera}, is also recommended to understand whether it is causing any other undetected issues.
 
 
 
